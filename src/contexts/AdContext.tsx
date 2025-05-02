@@ -3,6 +3,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useUser } from './UserContext';
 
+// Check if running in Capacitor (mobile)
+const isCapacitor = window.location.protocol === 'capacitor:';
+
 // Mock AdMob for web development
 // In a real app, you would use the appropriate AdMob library
 interface AdMob {
@@ -63,6 +66,7 @@ const AdContext = createContext<AdContextType | undefined>(undefined);
 export const AdProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { updateUserCredits, incrementAdCount, canWatchAd } = useUser();
   const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [adsenseInitialized, setAdsenseInitialized] = useState(false);
   
   // AdMob configuration
   const adMobConfig = {
@@ -72,28 +76,57 @@ export const AdProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     appId: 'ca-app-pub-3279473081670891~9908825517'
   };
 
+  // Initialize AdSense for web
   useEffect(() => {
-    // Initialize AdMob
-    // In a real app, you would use the actual AdMob initialization code
-    console.log('Initializing AdMob with app ID:', adMobConfig.appId);
-    
-    const initAds = async () => {
-      // Simulate loading interstitial and rewarded ads
-      await mockAdMob.loadInterstitial();
-      await mockAdMob.loadRewarded();
-      setIsAdLoaded(true);
-    };
-    
-    initAds();
-    
-    // Show banner ad
-    mockAdMob.loadBanner();
-    mockAdMob.showBanner();
-    
-    return () => {
-      // Clean up
-      mockAdMob.hideBanner();
-    };
+    if (!isCapacitor && !adsenseInitialized) {
+      // Add Google AdSense script
+      const script = document.createElement('script');
+      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3279473081670891';
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
+      
+      script.onload = () => {
+        console.log('AdSense loaded successfully');
+        setAdsenseInitialized(true);
+      };
+      
+      script.onerror = () => {
+        console.error('Failed to load AdSense');
+      };
+      
+      return () => {
+        // Clean up if component unmounts
+        if (document.head.contains(script)) {
+          document.head.removeChild(script);
+        }
+      };
+    }
+  }, [adsenseInitialized]);
+
+  useEffect(() => {
+    // Initialize AdMob for Capacitor apps
+    if (isCapacitor) {
+      console.log('Initializing AdMob with app ID:', adMobConfig.appId);
+      
+      const initAds = async () => {
+        // Simulate loading interstitial and rewarded ads
+        await mockAdMob.loadInterstitial();
+        await mockAdMob.loadRewarded();
+        setIsAdLoaded(true);
+      };
+      
+      initAds();
+      
+      // Show banner ad
+      mockAdMob.loadBanner();
+      mockAdMob.showBanner();
+      
+      return () => {
+        // Clean up
+        mockAdMob.hideBanner();
+      };
+    }
   }, []);
 
   const showInterstitialAd = async (): Promise<boolean> => {
@@ -173,6 +206,19 @@ export const AdProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   return (
     <AdContext.Provider value={{ showInterstitialAd, showRewardedAd, isAdLoaded }}>
       {children}
+      
+      {!isCapacitor && (
+        <div className="adsense-container">
+          <ins 
+            className="adsbygoogle"
+            style={{ display: 'block' }}
+            data-ad-client="ca-pub-3279473081670891"
+            data-ad-slot="1003101920"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          ></ins>
+        </div>
+      )}
     </AdContext.Provider>
   );
 };

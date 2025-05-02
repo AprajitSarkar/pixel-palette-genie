@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, CreditCard, Settings, Image, User, Volume2 } from 'lucide-react';
+import { Home, CreditCard, Settings, Image, User, Volume2, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,6 +32,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <h1 className="text-2xl font-bold text-gradient">Pixel Palette</h1>
         </div>
         <div className="flex items-center gap-2">
+          {/* Edit Button */}
+          <Button variant="ghost" size="icon" className="rounded-full" asChild>
+            <Link to={location.pathname + "?edit=true"}>
+              <Edit size={20} />
+              <span className="sr-only">Edit</span>
+            </Link>
+          </Button>
+          
           {loading ? (
             <div className="flex items-center gap-2">
               <Skeleton className="w-8 h-8 rounded-full" />

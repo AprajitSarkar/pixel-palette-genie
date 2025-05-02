@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
+import { Helmet } from 'react-helmet-async';
+import { Volume2, Image, CreditCard } from 'lucide-react';
 
 const Index = () => {
   const { user } = useUser();
@@ -20,6 +22,12 @@ const Index = () => {
 
   return (
     <div className={`space-y-8 ${showAnimation ? "animate-fade-in" : ""}`}>
+      <Helmet>
+        <title>Pixel Palette - Free AI Image & Voice Generator</title>
+        <meta name="description" content="Create beautiful AI-generated images and audio with our free AI tools. No limits, no restrictions." />
+        <meta name="keywords" content="ai image generator, free text to speech, ai art, free tts, unlimited ai generation" />
+      </Helmet>
+      
       <div className="relative overflow-hidden rounded-xl p-8 mb-8">
         {/* Background effect */}
         <div className="absolute -top-24 -left-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
@@ -40,6 +48,35 @@ const Index = () => {
                 Login to Save Images
               </Button>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* TTS Feature Highlight */}
+      <div className="bg-secondary/30 p-8 rounded-lg mb-8 relative overflow-hidden">
+        <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl"></div>
+        
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
+              <Volume2 className="text-primary" />
+              Text to Speech
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Convert any text to natural-sounding speech with our TTS tool. Multiple voices and languages available completely for free.
+            </p>
+            <Button onClick={() => navigate('/text-to-speech')} className="glow-effect">
+              Try Text to Speech
+            </Button>
+          </div>
+          <div className="flex-1 flex justify-center">
+            <div className="p-4 bg-background/50 rounded-lg border border-border w-full max-w-xs">
+              <div className="h-24 rounded-md bg-background flex items-center justify-center text-muted-foreground">
+                <Volume2 size={48} className="text-primary" />
+              </div>
+              <div className="mt-4 h-4 w-3/4 bg-muted rounded-full"></div>
+              <div className="mt-2 h-4 w-1/2 bg-muted rounded-full"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -118,6 +155,16 @@ const Index = () => {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Ad disclosure section */}
+      <div className="mt-6 text-center text-sm text-muted-foreground">
+        <p>Pixel Palette shows ads to help keep our services free.</p>
+        <p className="mt-1">
+          <a href="/privacy-policy" className="text-primary hover:underline">
+            View our Privacy Policy
+          </a>
+        </p>
       </div>
     </div>
   );
