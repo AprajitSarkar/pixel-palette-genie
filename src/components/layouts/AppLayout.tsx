@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, CreditCard, Settings, Image, User } from 'lucide-react';
+import { Home, CreditCard, Settings, Image, User, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +19,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/generate', icon: Image, label: 'Generate' },
+    { path: '/text-to-speech', icon: Volume2, label: 'TTS' },
     { path: '/credits', icon: CreditCard, label: 'Credits' },
     { path: '/settings', icon: Settings, label: 'Settings' }
   ];

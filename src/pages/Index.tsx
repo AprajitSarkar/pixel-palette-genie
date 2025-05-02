@@ -28,7 +28,7 @@ const Index = () => {
         <div className="relative z-10">
           <h1 className="text-4xl font-bold mb-4">Welcome to Pixel Palette</h1>
           <p className="text-lg text-muted-foreground mb-6">
-            Create beautiful AI-generated images with our cute and powerful image generation tool
+            Create beautiful AI-generated images and audio with our cute and powerful AI tools
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -68,12 +68,19 @@ const Index = () => {
         
         <div className="bg-secondary/50 p-6 rounded-lg">
           <div className="mb-4 rounded-full w-12 h-12 flex items-center justify-center bg-primary/20 text-primary">
-            💾
+            🔊
           </div>
-          <h3 className="text-xl font-medium mb-2">Save Your Creations</h3>
+          <h3 className="text-xl font-medium mb-2">Text to Speech</h3>
           <p className="text-muted-foreground">
-            Login to save and access your creations anytime
+            Convert text to natural-sounding speech with our TTS tool
           </p>
+          <Button 
+            variant="link" 
+            onClick={() => navigate('/text-to-speech')} 
+            className="mt-2 px-0"
+          >
+            Try it now →
+          </Button>
         </div>
       </div>
 
@@ -86,19 +93,30 @@ const Index = () => {
               <span className="text-foreground font-medium">Create your first image</span> - Try it without logging in
             </li>
             <li className="text-muted-foreground">
+              <span className="text-foreground font-medium">Try our text-to-speech</span> - Convert text to natural speech
+            </li>
+            <li className="text-muted-foreground">
               <span className="text-foreground font-medium">Create an account</span> - Get 30 free credits
             </li>
             <li className="text-muted-foreground">
-              <span className="text-foreground font-medium">Generate more images</span> - Each generation costs 10 credits
+              <span className="text-foreground font-medium">Generate more content</span> - Each generation costs 10 credits
             </li>
             <li className="text-muted-foreground">
               <span className="text-foreground font-medium">Earn more credits</span> - Watch ads to earn free credits
             </li>
           </ol>
           
-          <Button className="mt-6" onClick={() => navigate('/generate')}>
-            Start Now
-          </Button>
+          <div className="flex flex-wrap gap-3 mt-6">
+            <Button onClick={() => navigate('/generate')}>
+              Generate Images
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/text-to-speech')}
+            >
+              Try Text to Speech
+            </Button>
+          </div>
         </div>
       </div>
     </div>
