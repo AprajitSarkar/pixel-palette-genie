@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 
 // Pages
 import Index from "./pages/Index";
@@ -52,26 +53,28 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <UserProvider>
-          <AdProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-                <Route path="/generate" element={<AppLayout><Generate /></AppLayout>} />
-                <Route path="/credits" element={<AppLayout><Credits /></AppLayout>} />
-                <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
-                <Route path="/privacy-policy" element={<AppLayout><PrivacyPolicy /></AppLayout>} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </AdProvider>
-        </UserProvider>
-      </TooltipProvider>
+      <HelmetProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <UserProvider>
+            <AdProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+                  <Route path="/generate" element={<AppLayout><Generate /></AppLayout>} />
+                  <Route path="/credits" element={<AppLayout><Credits /></AppLayout>} />
+                  <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
+                  <Route path="/privacy-policy" element={<AppLayout><PrivacyPolicy /></AppLayout>} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </AdProvider>
+          </UserProvider>
+        </TooltipProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 };

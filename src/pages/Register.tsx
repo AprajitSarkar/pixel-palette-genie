@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Register = () => {
