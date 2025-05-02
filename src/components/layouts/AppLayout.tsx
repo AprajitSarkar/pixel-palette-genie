@@ -5,6 +5,7 @@ import { Home, CreditCard, Settings, Image, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { userData, loading } = useUser();
+  const isMobile = useIsMobile();
   
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
@@ -36,7 +38,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
           ) : userData ? (
             <div className="flex items-center gap-2">
-              <div className="flex flex-col items-end">
+              <div className={`flex flex-col items-end ${isMobile ? 'hidden sm:flex' : ''}`}>
                 <span className="text-sm text-muted-foreground">{userData.username}</span>
                 <span className="text-xs font-medium flex gap-1 items-center">
                   <span className="text-primary">✨</span>

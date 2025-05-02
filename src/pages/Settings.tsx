@@ -1,12 +1,13 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { updatePassword, sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'firebase/auth';
+import { db, auth } from '@/lib/firebase';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,13 +19,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Settings = () => {
   const { user, userData, signOut } = useUser();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const [username, setUsername] = useState<string>(userData?.username || '');
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [currentPassword, setCurrentPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const updateUsername = async () => {
     if (!user || !username.trim()) return;
@@ -46,16 +61,81 @@ const Settings = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!user || !currentPassword || !newPassword || !confirmNewPassword) {
+      toast.error('Please fill out all password fields');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('Password should be at least 6 characters');
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      
+      // Re-authenticate user
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      
+      // Change password
+      await updatePassword(user, newPassword);
+      
+      toast.success('Password updated successfully');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setDialogOpen(false);
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      if (error.code === 'auth/wrong-password') {
+        toast.error('Current password is incorrect');
+      } else {
+        toast.error('Failed to update password');
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!user || !user.email) {
+      toast.error('No email associated with this account');
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      toast.success('Password reset email sent. Check your inbox.');
+    } catch (error) {
+      console.error('Error sending reset email:', error);
+      toast.error('Failed to send password reset email');
+    }
+  };
+
   const handleDeleteAccount = async () => {
     // This would typically include additional logic for deleting user data
-    // For this demo, we'll just sign out
     try {
-      await signOut();
+      if (!user) return;
+      
+      // Delete user data from Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, { deleted: true });
+      
+      // Delete user authentication
+      await deleteUser(user);
+      
       toast.success('Account deleted successfully');
       navigate('/');
     } catch (error) {
       console.error('Error deleting account:', error);
-      toast.error('Failed to delete account');
+      toast.error('Failed to delete account. Try signing in again before deleting.');
     }
   };
 
@@ -87,7 +167,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in px-4 md:px-0">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground">
@@ -116,7 +196,7 @@ const Settings = () => {
               <label htmlFor="username" className="block text-sm font-medium mb-1">
                 Username
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   id="username"
                   value={username}
@@ -128,6 +208,86 @@ const Settings = () => {
                   {isUpdating ? 'Updating...' : 'Update'}
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-secondary/20 p-6 rounded-lg glass-effect">
+          <h3 className="text-xl font-medium mb-4 text-accent">Account Security</h3>
+          
+          <div className="space-y-4">
+            {/* Change Password Button */}
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  Change Password
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Enter your current password and a new password below.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <label htmlFor="current-password" className="text-sm font-medium">
+                      Current Password
+                    </label>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="new-password" className="text-sm font-medium">
+                      New Password
+                    </label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="confirm-password" className="text-sm font-medium">
+                      Confirm New Password
+                    </label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleChangePassword} disabled={isUpdating}>
+                    {isUpdating ? 'Updating...' : 'Save Changes'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Forgot Password Button */}
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto mt-4" 
+              onClick={handleForgotPassword}
+            >
+              Reset Password via Email
+            </Button>
+            
+            {/* Privacy Policy Link */}
+            <div className="mt-4 pt-4 border-t border-border">
+              <Link to="/privacy-policy" className="text-primary hover:underline">
+                View Privacy Policy
+              </Link>
             </div>
           </div>
         </div>

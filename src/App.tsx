@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // Components
 import AppLayout from "./components/layouts/AppLayout";
@@ -62,6 +63,7 @@ const App = () => {
                 <Route path="/generate" element={<AppLayout><Generate /></AppLayout>} />
                 <Route path="/credits" element={<AppLayout><Credits /></AppLayout>} />
                 <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
+                <Route path="/privacy-policy" element={<AppLayout><PrivacyPolicy /></AppLayout>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />

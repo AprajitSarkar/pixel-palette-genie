@@ -4,13 +4,13 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  // Your Firebase config will need to be added here by the user
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyDSq9TbdLhJ-m9Ov3ZCRotwhrBWOFFAVUE",
+  authDomain: "stube-clone.firebaseapp.com",
+  databaseURL: "https://stube-clone-default-rtdb.firebaseio.com",
+  projectId: "stube-clone",
+  storageBucket: "stube-clone.firebasestorage.app",
+  messagingSenderId: "872937502355",
+  appId: "1:872937502355:android:15185df77e36ab7a91ff66"
 };
 
 const app = initializeApp(firebaseConfig);
